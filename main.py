@@ -5,7 +5,7 @@ import telebot
 import random
 
 URL = 'https://www.anekdot.ru/best/anekdot/'
-API_KEY = '5430044194:AAFZyfZQf4rth0YJhw4F8lrbWEoukqySkak'
+API_KEY = ''
 
 
 class Parse:
