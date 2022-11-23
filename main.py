@@ -3,9 +3,13 @@ from telebot import types
 from bs4 import BeautifulSoup as bs
 import telebot
 import random
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 URL = 'https://www.anekdot.ru/best/anekdot/'
-API_KEY = ''
+API_KEY = os.getenv('TOKEN')
 
 
 class Parse:
