@@ -15,10 +15,12 @@ logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-def Theme_list(file):  #  Через эту функцию список тем будет загружаться в лист
+def Theme_list(file,mode='parse'):  #  Через эту функцию список тем будет загружаться в лист
     f = open (file, encoding='utf-8')
     theme_list = f.read()
     f.close()
+    if mode == 'recognition':
+        return (theme_list)
     theme_list = theme_list.split('\n')
     theme_list.sort()
     return (theme_list)
@@ -59,7 +61,7 @@ def choice(message: types.Message):
     elif message.text == 'Новости с общепрофильных сайтов':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         for button in Theme_list('Theme_list.txt'): # Каждый эдд это новый ряд
-            markup.add(types.KeyboardButton(button[2:]))#,callback_data=f"{button[:][0]}")) # Здесь ебейшая загвоздка с размером колбэк даты, походу придется биндить через цифры
+            markup.add(types.KeyboardButton(button))#,callback_data=f"{button[:][0]}")) # Здесь ебейшая загвоздка с размером колбэк даты, походу придется биндить через цифры
         bot.send_message(message.chat.id, text='Выберите тему',reply_markup=markup) #Темы надо сокращать, получается пиздец
 # С реплай кнопками выглядит сочнее если честно, но надо спросить у всех что все думают
     elif message.text == 'Сооружение и эксплуатация АЭС и атомных реакторов':
@@ -87,13 +89,21 @@ def get_audio_messages(message: types.Message):
     text = converter.audio_to_text()
     del converter
     pattern = text[:25]
-    f = open('Theme_list.txt', encoding='utf-8')
-    theme_list = f.read()
-    result = re.findall(pattern,theme_list)
-    f.close()
-    bot.send_message(message.chat.id, text= result[0])
-    Parser().Parse_wide()
-
+    pattern = str(pattern)
+    result = None
+    theme_list =  Theme_list('Theme_list.txt','recognition')
+    #for theme in theme_list:
+    try:
+        result = re.findall(pattern, theme_list)
+        #logger.info(f"Chat {name} (ID: {message.chat.id}) {result}")
+    except re.error:
+        pass
+    if result != []:                #Добавить обязательно вывод не распознанного а полной темы по ее куску
+        bot.send_message(message.chat.id, text= result[0])
+        Parser().Parse_wide()
+    else:
+    #if message.content_type == 'voice':
+        bot.send_message(message.chat.id, text="Повторите название темы")
 
 
 @bot.callback_query_handler(func=lambda call: True)
