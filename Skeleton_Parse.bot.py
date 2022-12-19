@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import logging
 import transcriptbot
 import re
+import im
+import stepbrother
 
 load_dotenv()
 
@@ -30,7 +32,8 @@ class Parser:
     def __init__(self):
         pass
     def Parse_prof(self):
-        return ('Okay')
+        return (stepbrother.step())
+        #return (im.imp())
     def Parse_wide(self):
         return ('Okay1')
 
@@ -39,32 +42,26 @@ class Parser:
 def start(message: types.Message):
     name = message.chat.first_name if message.chat.first_name else 'No_name'
     logger.info(f"Chat {name} (ID: {message.chat.id}) started bot")
-    welcome_mess = f'Добрый день,{name} \nВыберите сайты, откуда искать новости'
+    welcome_mess = f'Добрый день, Андрей Андреевич \nВыберите сайты, откуда искать новости'
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     buttons = [types.KeyboardButton("Новости с профильных сайтов"), types.KeyboardButton("Новости с общепрофильных сайтов")]
     for button in buttons:
         markup.add(button)
     bot.send_message(message.chat.id, welcome_mess, reply_markup=markup)
-    # Баг с добавлением листа в маркап
 
 
 @bot.message_handler(content_types=['text'])  #Будет выбор для парсера всех новостей с профильных сайтов или для выборочного парсера больших сайтов
 def choice(message: types.Message):
     if message.text == 'Новости с профильных сайтов':
-        bot.send_message(message.chat.id, text=Parser().Parse_prof())
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        buttons = [types.KeyboardButton("Новости с профильных сайтов"),
-                   types.KeyboardButton("Новости с общепрофильных сайтов")]
-        for button in buttons:
-            markup.add(button)
-        bot.send_message(message.chat.id, text="Функция в разработке", reply_markup=markup)
+        for news in Parser().Parse_prof():
+            bot.send_message(message.chat.id, text=news)
     elif message.text == 'Новости с общепрофильных сайтов':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         for button in Theme_list('Theme_list.txt'): # Каждый эдд это новый ряд
             markup.add(types.KeyboardButton(button))#,callback_data=f"{button[:][0]}")) # Здесь ебейшая загвоздка с размером колбэк даты, походу придется биндить через цифры
         bot.send_message(message.chat.id, text='Выберите тему',reply_markup=markup) #Темы надо сокращать, получается пиздец
 # С реплай кнопками выглядит сочнее если честно, но надо спросить у всех что все думают
-    elif message.text == 'Сооружение и эксплуатация АЭС и атомных реакторов':
+    elif message.text == 'Сооружение и эксплуатация АЭС и атомных реакторов': #Дописать этот кусок по уму
         bot.send_message(message.chat.id, text=Parser().Parse_wide())
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
         buttons = [types.KeyboardButton("Новости с профильных сайтов"),
@@ -72,7 +69,11 @@ def choice(message: types.Message):
         for button in buttons:
             markup.add(button)
         bot.send_message(message.chat.id, text="Функция в разработке", reply_markup=markup)
-
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    buttons = [types.KeyboardButton("Новости с профильных сайтов"),
+               types.KeyboardButton("Новости с общепрофильных сайтов")]
+    for button in buttons:
+        markup.add(button)
 
 @bot.message_handler(content_types=['voice'])
 def get_audio_messages(message: types.Message):
@@ -81,7 +82,6 @@ def get_audio_messages(message: types.Message):
     file_name = str(message.message_id) + '.ogg'
     name = message.chat.first_name if message.chat.first_name else 'No_name'
     logger.info(f"Chat {name} (ID: {message.chat.id}) download file {file_name}")
-
     with open(file_name, 'wb') as new_file:
         new_file.write(downloaded_file)
     converter = transcriptbot.Converter(file_name)
@@ -106,9 +106,9 @@ def get_audio_messages(message: types.Message):
         bot.send_message(message.chat.id, text="Повторите название темы")
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_handler(call):
-    bot.send_message(call.message.chat.id, text="Okay")
+#@bot.callback_query_handler(func=lambda call: True)
+#def callback_handler(call):
+ #   bot.send_message(call.message.chat.id, text="Okay")
 
 
 if __name__ == '__main__':
