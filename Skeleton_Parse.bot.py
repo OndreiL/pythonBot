@@ -53,29 +53,30 @@ def start(message: types.Message):
 
 @bot.message_handler(content_types=['text'])  #Будет выбор для парсера всех новостей с профильных сайтов или для выборочного парсера больших сайтов
 def choice(message: types.Message):
-    if message.text == 'Новости с профильных сайтов': #TODO Переписать всю конструкцию через матч кейс
-        for news in Parser().Parse_prof():
-            bot.send_message(message.chat.id, text=news)
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        buttons = [types.KeyboardButton("Новости с профильных сайтов"),
-                   types.KeyboardButton("Новости с общепрофильных сайтов")]
-        for button in buttons:
-            markup.add(button)
-        bot.send_message(message.chat.id, "Что-то еще?", reply_markup=markup)
-    elif message.text == 'Новости с общепрофильных сайтов':
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        for button in Theme_list('Theme_list.txt'): # Каждый эдд это новый ряд
-            markup.add(types.KeyboardButton(button))#,callback_data=f"{button[:][0]}"))
-        bot.send_message(message.chat.id, text='Выберите тему',reply_markup=markup) #Темы надо сокращать
-# С реплай кнопками выглядит сочнее если честно, но надо спросить у всех что все думают
-    elif message.text == 'Сооружение и эксплуатация АЭС и атомных реакторов': #Дописать этот кусок по уму
-        bot.send_message(message.chat.id, text=Parser().Parse_wide())
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        buttons = [types.KeyboardButton("Новости с профильных сайтов"),
-                   types.KeyboardButton("Новости с общепрофильных сайтов")]
-        for button in buttons:
-            markup.add(button)
-        bot.send_message(message.chat.id, text="Функция в разработке", reply_markup=markup)
+    match message.text:
+        case 'Новости с профильных сайтов': #TODO Переписать всю конструкцию через матч кейс
+            for news in Parser().Parse_prof():
+                bot.send_message(message.chat.id, text=news)
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+            buttons = [types.KeyboardButton("Новости с профильных сайтов"),
+                       types.KeyboardButton("Новости с общепрофильных сайтов")]
+            for button in buttons:
+                markup.add(button)
+            bot.send_message(message.chat.id, "Что-то еще?", reply_markup=markup)
+        case 'Новости с общепрофильных сайтов':
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            for button in Theme_list('Theme_list.txt'): # Каждый эдд это новый ряд
+                markup.add(types.KeyboardButton(button))#,callback_data=f"{button[:][0]}"))
+            bot.send_message(message.chat.id, text='Выберите тему',reply_markup=markup) #Темы надо сокращать
+    # С реплай кнопками выглядит сочнее если честно, но надо спросить у всех что все думают
+        case 'Сооружение и эксплуатация АЭС и атомных реакторов': #Дописать этот кусок по уму
+            bot.send_message(message.chat.id, text=Parser().Parse_wide())
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+            buttons = [types.KeyboardButton("Новости с профильных сайтов"),
+                       types.KeyboardButton("Новости с общепрофильных сайтов")]
+            for button in buttons:
+                markup.add(button)
+            bot.send_message(message.chat.id, text="Функция в разработке", reply_markup=markup)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     buttons = [types.KeyboardButton("Новости с профильных сайтов"),
                types.KeyboardButton("Новости с общепрофильных сайтов")]
