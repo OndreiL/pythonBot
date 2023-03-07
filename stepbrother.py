@@ -14,7 +14,7 @@ def join(ref):
     href = urljoin(url, ref)
     return(href)
 
-def step():
+def parse():
     filteredNews = []
     soup = BeautifulSoup(page.text, "html.parser")
     soup = soup.find('div', id='block-system-main')
@@ -30,5 +30,6 @@ def step():
                     filteredNews.append(f'{data.text} \n {join(num)}')
         #print(filteredNews)
     return filteredNews
-#for data in filteredNews:
-    #print(data)
+
+if __name__ == '__main__':
+    print (parse())
