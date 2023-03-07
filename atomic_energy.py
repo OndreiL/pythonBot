@@ -14,7 +14,7 @@ def join(ref):
     href = urljoin(url, ref)
     return(href)
 
-#def step():
+#def parse():
 filteredNews = []
 soup = BeautifulSoup(page.text, "html.parser")
 soup = soup.find("div", {"class": "content rc7"})
@@ -22,7 +22,6 @@ soup = soup.find("div", {"class": "content rc7"})
 allNews = soup.findAll('p')
 for data in allNews:
     if data.find('a') is not None:
-        filteredNews.append(data.find('a').text)
         filteredNews.append(join(data.find('a')['href']))
     #print(filteredNews)
 #return filteredNews
