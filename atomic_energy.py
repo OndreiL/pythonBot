@@ -19,11 +19,14 @@ def parse():
     soup = BeautifulSoup(page.text, "html.parser")
     soup = soup.find("div", {"class": "content rc7"})
     #print (soup)
-    allNews = soup.findAll('p')
-    for data in allNews:
-        if data.find('a') is not None:
-            filteredNews.append(join(data.find('a')['href']))
-        #print(filteredNews)
+    #allNews = soup.contents
+    #allNews = soup.findAll('p')
+    for sibling in soup.div.next_siblings:
+        if sibling.previous_sibling.name == 'div':
+            if sibling.previous_sibling['class'] == ["date-group"]:
+             filteredNews.append(sibling.previous_sibling.string)
+        if sibling.name == 'p':
+            filteredNews.append(join(sibling.a['href']))
     return filteredNews
 
 if __name__ == '__main__':
