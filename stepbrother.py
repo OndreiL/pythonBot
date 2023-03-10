@@ -15,20 +15,25 @@ def join(ref):
     return(href)
 
 def parse():
-    filteredNews = []
+    filteredNews = {'Mephi':{}}
     soup = BeautifulSoup(page.text, "html.parser")
     soup = soup.find('div', id='block-system-main')
-    for i in range (1,12,1):
+    for i in range (1,13,1):
         allNews = soup.findAll('div', class_=f"views-row-{i}")
+        Date = str(datetime.now()).split(' ')[0]
+        if i == 0:
+            filteredNews['Mephi'][Date] = []
         for data in allNews:
             if data.find('a') is not None:
-                if datetime.strptime(data.find('span',{'class':"date-display-single"}).text,"%d.%m.%Y") > datetime.now() - timedelta(days=2):
-                    #filteredNews.append(data.text)
+                    Date = str(datetime.strptime(data.find('span', {'class': "date-display-single"}).text, "%d.%m.%Y")).split(' ')[0]
                     pattern = '\d{5}'
                     data = data.find('div', class_='views-field-title')
                     num = re.findall(pattern, str(data))
-                    filteredNews.append(f'{data.text} \n {join(num)}')
-        #print(filteredNews)
+                    try:
+                        filteredNews['Mephi'][Date].append({data.text: join(num)})
+                    except (KeyError):
+                        filteredNews['Mephi'][Date] = []
+                        filteredNews['Mephi'][Date].append({data.text: join(num)})
     return filteredNews
 
 if __name__ == '__main__':
