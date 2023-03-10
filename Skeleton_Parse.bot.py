@@ -33,7 +33,7 @@ class Parser:
     def __init__(self):
         pass
     def Parse_prof(self):
-        return (stepbrother.parse()+atomic_energy.parse())
+        return (atomic_energy.parse(stepbrother.parse()))
         #return (im.imp())
     def Parse_wide(self):
         return ('Okay1')
