@@ -25,7 +25,7 @@ def parse():
             filteredNews['Mephi'][Date] = []
         for data in allNews:
             if data.find('a') is not None:
-                    Date = str(datetime.strptime(data.find('span', {'class': "date-display-single"}).text, "%d.%m.%Y")).split(' ')[0]
+                    Date = re.sub(r'(\d{4})-(\d{2})-(\d{2})', r'\3.\2.\1', str(datetime.strptime(data.find('span', {'class': "date-display-single"}).text, "%d.%m.%Y")).split(' ')[0])
                     pattern = '\d{5}'
                     data = data.find('div', class_='views-field-title')
                     num = re.findall(pattern, str(data))
