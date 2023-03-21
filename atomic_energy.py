@@ -35,7 +35,7 @@ def parse():
         for sibling in soup.div.next_siblings:
             if sibling.previous_sibling.name == 'div':
                 if sibling.previous_sibling['class'] == ["date-group"]:
-                    Date = date_converter(sibling.previous_sibling.string)
+                    Date: str = date_converter(sibling.previous_sibling.string)
                     filteredNews['Atom_energy'][Date] = []
             if sibling.name == 'p':
                 filteredNews['Atom_energy'][Date].append({sibling.text: join(sibling.a['href'])})
