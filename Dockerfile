@@ -8,7 +8,7 @@ WORKDIR /code
 
 COPY --from=builder /root/.local /root.local
 
-EXPOSE 80/tcp
+EXPOSE 443/tcp
 
 ENV PATH=/root/.local:$PATH
 
