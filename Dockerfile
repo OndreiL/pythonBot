@@ -8,6 +8,8 @@ WORKDIR /code
 
 COPY --from=builder /root/.local /root.local
 
+EXPOSE 433
+
 ENV PATH=/root/.local:$PATH
 
 CMD ["python","-u","./Skeleton_parse.bot.py"]
