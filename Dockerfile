@@ -8,7 +8,7 @@ WORKDIR /code
 
 COPY --from=builder /root/.local /root.local
 
-
+EXPOSE 3000
 
 ENV PATH=/root/.local:$PATH
 
