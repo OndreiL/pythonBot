@@ -13,11 +13,6 @@ load_dotenv()
 TOKEN = os.getenv('TOKEN')    # token for the telegram API is located in .env
 bot = telebot.TeleBot(TOKEN)
 
-# webhook settings
-
-
-
-
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -48,7 +43,7 @@ class Parser:
 def start(message: types.Message):
     name = message.chat.first_name if message.chat.first_name else 'No_name'
     logger.info(f"Chat {name} (ID: {message.chat.id}) started bot")
-    welcome_mess = f'Добрый день, Андрей Андреевич \nВыберите сайты, откуда искать новости'
+    welcome_mess = f'Добрый день, {name} \nВыберите сайты, откуда искать новости'
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     buttons = [types.KeyboardButton("Новости с профильных сайтов"), types.KeyboardButton("Новости с общепрофильных сайтов")]
     for button in buttons:
