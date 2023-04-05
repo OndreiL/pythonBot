@@ -5,7 +5,7 @@ from urllib.parse import urlparse, urljoin
 import html5lib
 from datetime import datetime, timedelta
 
-filteredNews = {'Atom_energy':{}}
+filteredNews = {'Атомная энергия':{}}
 url = 'https://www.atomic-energy.ru/'
 def join(ref):
     ref = ''.join(ref)
@@ -36,9 +36,9 @@ def parse():
             if sibling.previous_sibling.name == 'div':
                 if sibling.previous_sibling['class'] == ["date-group"]:
                     Date: str = date_converter(sibling.previous_sibling.string)
-                    filteredNews['Atom_energy'][Date] = []
+                    filteredNews['Атомная энергия'][Date] = []
             if sibling.name == 'p':
-                filteredNews['Atom_energy'][Date].append({sibling.text: join(sibling.a['href'])})
+                filteredNews['Атомная энергия'][Date].append({sibling.text: join(sibling.a['href'])})
         page = requests.get(join(soup.find('a', {'title': f'На страницу номер {i}'})['href']))
         soup = BeautifulSoup(page.content, "html.parser")
     return filteredNews

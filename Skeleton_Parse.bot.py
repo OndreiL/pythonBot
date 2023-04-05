@@ -3,6 +3,8 @@ import telebot
 from telebot import types
 from dotenv import load_dotenv
 import logging
+import schedule
+import main
 import transcriptbot
 import re
 import stepbrother
@@ -17,6 +19,8 @@ bot = telebot.TeleBot(TOKEN)
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
 
 def Theme_list(file,mode='parse'):  #  Через эту функцию список тем будет загружаться в лист
     f = open (file, encoding='utf-8')
@@ -33,7 +37,7 @@ class Parser:
     def __init__(self):
         pass
     def Parse_prof(self):
-        return (atomic_energy.parse(stepbrother.parse()))
+        return (main.display())
         #return (im.imp())
     def Parse_wide(self):
         return ('Okay1')
@@ -56,7 +60,10 @@ def choice(message: types.Message):
     match message.text:
         case 'Новости с профильных сайтов':
             for news in Parser().Parse_prof():
-                bot.send_message(message.chat.id, text=news)
+                if type(news) == list:
+                    bot.send_message(message.chat.id, text=news[0])
+                else:
+                    bot.send_message(message.chat.id, text=news)
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
             buttons = [types.KeyboardButton("Новости с профильных сайтов"),
                        types.KeyboardButton("Новости с общепрофильных сайтов")]
@@ -122,3 +129,4 @@ def get_audio_messages(message: types.Message):
 if __name__ == '__main__':
     logger.info("Starting bot")
     bot.polling(none_stop=True)
+    schedule.every(12).hours.do(main.all_parse())
