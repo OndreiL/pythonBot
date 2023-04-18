@@ -7,8 +7,6 @@ import schedule
 import main
 import transcriptbot
 import re
-import stepbrother
-import atomic_energy
 
 load_dotenv()
 
@@ -56,20 +54,35 @@ def start(message: types.Message):
 
 
 @bot.message_handler(content_types=['text'])  #Будет выбор для парсера всех новостей с профильных сайтов или для выборочного парсера больших сайтов
-def choice(message: types.Message):
+def choice(message: types.Message, page=1):
     match message.text:
         case 'Новости с профильных сайтов':
-            for news in Parser().Parse_prof():
-                if type(news) == list:
-                    bot.send_message(message.chat.id, text=news[0])
-                else:
-                    bot.send_message(message.chat.id, text=news)
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-            buttons = [types.KeyboardButton("Новости с профильных сайтов"),
-                       types.KeyboardButton("Новости с общепрофильных сайтов")]
-            for button in buttons:
-                markup.add(button)
-            bot.send_message(message.chat.id, "Что-то еще?", reply_markup=markup)
+            #for news in Parser().Parse_prof():
+                #if type(news) == list:
+                   # bot.send_message(message.chat.id, text=news[0])
+               # else:
+                   # bot.send_message(message.chat.id, text=news)
+            #markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+            buttons = types.InlineKeyboardMarkup()
+            pages_count=len(Parser().Parse_prof().keys())
+            left = page - 1 if page != 1 else pages_count
+            right = page + 1 if page != pages_count else 1
+
+            left_button = types.InlineKeyboardButton("←", callback_data=f'to {left}')
+            page_button = types.InlineKeyboardButton(f"{str(page)}/{str(pages_count)}", callback_data='_')
+            right_button = types.InlineKeyboardButton("→", callback_data=f'to {right}')
+            buy_button = types.InlineKeyboardButton("Перейти", callback_data='buy')
+            buttons.add(left_button, page_button, right_button)
+            buttons.add(buy_button)
+
+            msg = f"Название: *{Parser().Parse_prof()}*\nОписание: *{Parser().Parse_prof()[0][0][0]}*"
+
+            bot.send_message(message.chat.id, text=msg)
+            #buttons = [types.KeyboardButton("Новости с профильных сайтов"),
+                      # types.KeyboardButton("Новости с общепрофильных сайтов")]
+            #for button in buttons:
+                #markup.add(button)
+            #bot.send_message(message.chat.id, "Что-то еще?", reply_markup=markup)
         case 'Новости с общепрофильных сайтов':
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             for button in Theme_list('Theme_list.txt'): # Каждый эдд это новый ряд
@@ -89,6 +102,14 @@ def choice(message: types.Message):
                types.KeyboardButton("Новости с общепрофильных сайтов")]
     for button in buttons:
         markup.add(button)
+
+
+@bot.callback_query_handler(func=lambda c: True)
+def callback(c):
+    if 'to' in c.data:
+        page = int(c.data.split(' ')[1])
+        start(c.message, page=page, previous_message=c.message)
+
 
 @bot.message_handler(content_types=['voice'])
 def get_audio_messages(message: types.Message):
@@ -130,3 +151,6 @@ if __name__ == '__main__':
     logger.info("Starting bot")
     bot.polling(none_stop=True)
     schedule.every(12).hours.do(main.all_parse())
+
+
+#ВИД СЛОВАРЯ ДЛЯ ПАРСИНГА: {Ключ(Источник): {Ключ(Дата):[{Ключ(Заголовок): Новость(Ссылка)}]}}
