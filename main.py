@@ -18,17 +18,16 @@ def all_parse():
 def display():
     with open('news', "r", encoding="utf-8") as file:
         final_dict = json.load(file)
-        print(final_dict)
-        printing_info = []
-        for dates in final_dict:
-            if datetime.strptime(dates, '%d.%m.%Y') > datetime.today() - timedelta(days=3):
-                printing_info.append(dates)
-                if type(final_dict[dates]) == list:
-                    for news in final_dict[dates]:
-                        for key, value in news.items():
-                            printing_info.append(key +" \n " + value)
-                else:
-                    printing_info.append(final_dict[dates])
+      #  printing_info = []
+      #  for dates in final_dict:
+      #      if datetime.strptime(dates, '%d.%m.%Y') > datetime.today() - timedelta(days=3):
+       #         printing_info.append(dates)
+       #         if type(final_dict[dates]) == list:
+       #             for news in final_dict[dates]:
+       #                 for key, value in news.items():
+       #                     printing_info.append(key +" \n " + value)
+       #         else:
+       #             printing_info.append(final_dict[dates])
 
     return final_dict
 

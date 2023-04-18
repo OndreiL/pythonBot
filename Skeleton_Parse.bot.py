@@ -54,7 +54,8 @@ def start(message: types.Message):
 
 
 @bot.message_handler(content_types=['text'])  #Будет выбор для парсера всех новостей с профильных сайтов или для выборочного парсера больших сайтов
-def choice(message: types.Message, page=1):
+def choice(message: types.Message, page=0,  dat = list(Parser().Parse_prof().keys())[0], previous_message='None'):
+    global num_key
     match message.text:
         case 'Новости с профильных сайтов':
             #for news in Parser().Parse_prof():
@@ -64,20 +65,27 @@ def choice(message: types.Message, page=1):
                    # bot.send_message(message.chat.id, text=news)
             #markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
             buttons = types.InlineKeyboardMarkup()
-            pages_count=len(Parser().Parse_prof().keys())
-            left = page - 1 if page != 1 else pages_count
-            right = page + 1 if page != pages_count else 1
-
-            left_button = types.InlineKeyboardButton("←", callback_data=f'to {left}')
-            page_button = types.InlineKeyboardButton(f"{str(page)}/{str(pages_count)}", callback_data='_')
-            right_button = types.InlineKeyboardButton("→", callback_data=f'to {right}')
-            buy_button = types.InlineKeyboardButton("Перейти", callback_data='buy')
+            pages_count = len(Parser().Parse_prof()[dat])
+            if page == 0:
+                num_key = 0
+            if page == len(Parser().Parse_prof()[dat]):
+                page = 0
+                num_key += 1
+            dat = list(Parser().Parse_prof().keys())[num_key]
+            left_button = types.InlineKeyboardButton("←", callback_data=f'{page - 1}')
+            page_button = types.InlineKeyboardButton(f"{str(page)}/{str(pages_count)}", callback_data='НЕ ЖМИ СЮДА')
+            right_button = types.InlineKeyboardButton("→", callback_data=f'{page + 1}')
+            buy_button = types.InlineKeyboardButton("Перейти",url=list(Parser().Parse_prof()[dat][page].values())[0])
             buttons.add(left_button, page_button, right_button)
             buttons.add(buy_button)
 
-            msg = f"Название: *{Parser().Parse_prof()}*\nОписание: *{Parser().Parse_prof()[0][0][0]}*"
+            msg = f"Дата: *{dat}*\nНовость: {list(Parser().Parse_prof()[dat][page].keys())[0]}"
+            try:
+                bot.delete_message(message.chat.id, previous_message.id)
+            except:
+                pass
+            bot.send_message(message.chat.id, text=msg, reply_markup=buttons)
 
-            bot.send_message(message.chat.id, text=msg)
             #buttons = [types.KeyboardButton("Новости с профильных сайтов"),
                       # types.KeyboardButton("Новости с общепрофильных сайтов")]
             #for button in buttons:
@@ -106,9 +114,13 @@ def choice(message: types.Message, page=1):
 
 @bot.callback_query_handler(func=lambda c: True)
 def callback(c):
-    if 'to' in c.data:
-        page = int(c.data.split(' ')[1])
-        start(c.message, page=page, previous_message=c.message)
+    if c.data == 'НЕ ЖМИ СЮДА':
+        pass
+    if c.data.isdigit:
+        c.message.text='Новости с профильных сайтов'
+        choice(c.message, int(c.data), previous_message=c.message)
+
+
 
 
 @bot.message_handler(content_types=['voice'])
